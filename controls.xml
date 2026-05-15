@@ -1,0 +1,76 @@
+<GuiXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sir.insidi.at/or/schema/esoui.xsd">
+	<Controls>		
+        <Label name="LibControlTree_RowTemplate" inherits="ZO_SelectableLabel" virtual="true">
+            <Dimensions y="32" />
+            <Controls>
+                <Label name="$(parent)Label" font="ZoFontWinH4" wrapMode="ELLIPSIS" verticalAlignment="CENTER">
+                    <Anchor point="LEFT" />
+                </Label>
+                <Texture name="$(parent)Navigation" mouseEnabled="true" tier="MEDIUM">  <!-- textureFile="LibControlTree/nav2.dds" -->
+                    <Dimensions x="24" y="24" />
+                    <Anchor point="RIGHT" relativeTo="$(parent)Label" relativePoint="LEFT" offsetX="-4" />
+                </Texture>
+            </Controls>
+        </Label>
+
+		<TopLevelControl name="LibControlTree_TLC" excludeFromResizeToFitExtents="true" tier="HIGH">
+            <Anchor point="LEFT" offsetX="100" />
+            <Dimensions x="400" y="600" />
+            <Controls>
+                <Label name="$(parent)ControlName" font="ZoFontWinH3" color="FFFFFF" hidden="true" layer="TEXT">
+                    <Anchor point="BOTTOM" relativeTo="GuiRoot" relativePoint="TOPLEFT"/>
+                </Label>
+
+                <Control name="$(parent)Listing">
+                    <Anchor point="TOPLEFT" />
+                    <Dimensions x="400" y="600" />
+                    <Controls>
+                        <Backdrop name="$(parent)Background" inherits="ZO_DefaultBackdrop" excludeFromResizeToFitExtents="true" />
+                        <Control name="$(parent)Headers">
+							<Dimensions x="400" y="32" />
+							<Anchor point="TOPLEFT" />
+							<Controls>
+								<Label name="$(parent)Dummy" font="ZoFontWinH3" color="EEAA11" text="LibControlTree">
+                                    <Anchor point="LEFT" />
+                                </Label>
+							</Controls>
+						</Control>
+						<Control name="$(parent)ScrollableList" inherits="ZO_ScrollList">
+							<Anchor point="TOPLEFT" relativeTo="$(parent)Headers" relativePoint="BOTTOMLEFT" offsetY="6" />
+							<Anchor point="BOTTOMRIGHT" />
+						</Control>
+                    </Controls>
+                </Control>
+
+                <Control name="$(parent)Keybind" resizeToFitDescendents="true">
+                    <Dimensions x="100" y="36" />
+                    <Anchor point="BOTTOMLEFT" relativeTo="$(parent)Listing" relativePoint="TOPLEFT" offsetX="-8" offsetY="-12" />
+                    <Controls>
+                        <Label name="$(parent)KeyLabel" font="ZoFontKeybindStripKey" text="|cFF0000Ctrl|r + LMB" excludeFromFlexContainer="false">
+                            <Anchor point="CENTER" />
+                        </Label>
+                        <Backdrop name="$(parent)Background" inherits="ZO_LargeKeyBackdrop" excludeFromResizeToFitExtents="true">
+                            <AnchorFill />
+                        </Backdrop>
+                        <Label name="$(parent)Label" font="ZoFontWinH3" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_NORMAL" text="-">
+                            <Anchor point="LEFT" relativePoint="RIGHT" offsetX="4" />
+                        </Label>
+                    </Controls>
+                </Control>
+            </Controls>
+        </TopLevelControl>
+
+        <Texture name="LibControlTreeHighlight" color="FFFFFF" alpha="0.15" excludeFromResizeToFitExtents="true" layer="OVERLAY">
+            <AnchorFill />
+        </Texture>
+
+        <Texture name="LibControlTreeControlHighlight" color="0000FF" alpha="0.15" excludeFromResizeToFitExtents="true" layer="OVERLAY">
+            <AnchorFill />
+            <Controls>
+                <Backdrop name="$(parent)Background" inherits="ZO_GamepadNormalOutlineThin" inheritAlpha="false" edgeColor="00FF00">
+                    <AnchorFill />
+                </Backdrop>
+            </Controls>
+        </Texture>
+	</Controls>
+</GuiXml>

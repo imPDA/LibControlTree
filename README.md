@@ -8,7 +8,7 @@ Simple tool to examine controls structure (tree) 🌳
 
 - Move mouse over control (it will become highligted) and press `Ctrl + LMB` to open it's TLC in tree view
 
-<video controls src="media/2026-05-15 175616.mp4" title="Title" width="400"></video>
+<img src="media/2026-05-15 175616.gif" height="200">
 
 - Move mouse over leaves to see them higlighted
 

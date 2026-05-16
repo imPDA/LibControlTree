@@ -16,7 +16,8 @@
             </Controls>
         </Label>
 
-		<TopLevelControl name="LibControlTree_TLC" excludeFromResizeToFitExtents="true" tier="HIGH">
+        <!-- TODO: do I need HIGH tier here? -->
+		<TopLevelControl name="LibControlTree_TLC" excludeFromResizeToFitExtents="true" tier="HIGH" hidden="true">
             <Anchor point="LEFT" offsetX="100" />
             <Dimensions x="400" y="600" />
             <Controls>

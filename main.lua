@@ -30,7 +30,7 @@ local CONTROL_TYPE_NAMES = {
 local addonName = 'LibControlTree'
 local EVENT_NAMESPACE = addonName
 
-
+local CONTROL = LibControlTree_TLC
 local HIGHLIGHT_CONTROL = LibControlTreeHighlight
 local CONTROL_HIGHLIGHT_CONTROL = LibControlTreeControlHighlight
 local CONTROLNAME_CONTROL = LibControlTree_TLCControlName
@@ -337,7 +337,7 @@ local function OnAddonLoaded(_, addonName_)
 
     EVENT_MANAGER:RegisterForEvent(EVENT_NAMESPACE, EVENT_GLOBAL_MOUSE_UP, MouseClick)
 
-    EVENT_MANAGER:RegisterForUpdate(EVENT_NAMESPACE, 0, function()
+    local function handleHighlight()
         local controlTLC = WINDOW_MANAGER:GetMouseOverControl()
 
         -- followTheMouse(CONTROLNAME_CONTROL)
@@ -380,9 +380,24 @@ local function OnAddonLoaded(_, addonName_)
         -- CONTROLNAME_CONTROL:SetText(control:GetName())
         -- CONTROLNAME_CONTROL:SetHidden(false)
         _setKeybind(controlTLC:GetName(), 'update')
-    end)
+    end
+
+    -- EVENT_MANAGER:RegisterForUpdate(EVENT_NAMESPACE, 0, handleHighlight)
 
     CreateScrollListDataType()
+
+    SLASH_COMMANDS['/ctrltree'] = function()
+        local hidden = CONTROL:IsHidden()
+
+        CONTROL:SetHidden(not hidden)
+
+        if hidden then
+            EVENT_MANAGER:RegisterForUpdate(EVENT_NAMESPACE, 0, handleHighlight)
+        else
+            EVENT_MANAGER:UnregisterForUpdate(EVENT_NAMESPACE)
+            HIGHLIGHT_CONTROL:SetHidden(true)
+        end
+    end
 end
 
 

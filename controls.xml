@@ -6,6 +6,9 @@
                 <Label name="$(parent)Label" font="ZoFontWinH4" wrapMode="ELLIPSIS" verticalAlignment="CENTER">
                     <Anchor point="LEFT" />
                 </Label>
+                <Label name="$(parent)Type" font="ZoFontGame" color="999999AA" text="Update: - ms" mouseEnabled="true">
+                    <Anchor point="LEFT" relativeTo="$(parent)Label" relativePoint="RIGHT" offsetX="4" />
+                </Label>
                 <Texture name="$(parent)Navigation" mouseEnabled="true" tier="MEDIUM">  <!-- textureFile="LibControlTree/nav2.dds" -->
                     <Dimensions x="24" y="24" />
                     <Anchor point="RIGHT" relativeTo="$(parent)Label" relativePoint="LEFT" offsetX="-4" />

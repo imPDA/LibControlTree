@@ -1,5 +1,32 @@
 --local df = function(...) end
 
+local CONTROL_TYPE_NAMES = {
+    --[[-1]] [-1] = 'Invalid',
+    --[[ 0]] [0] = 'Control',
+    --[[ 1]] 'Label',
+    --[[ 2]] 'DebugText',
+    --[[ 3]] 'Texture',
+    --[[ 4]] 'TopLevelControl',
+    --[[ 5]] 'RootWindow',
+    --[[ 6]] 'TextBuffer',
+    --[[ 7]] 'Button',
+    --[[ 8]] 'StatusBar',
+    --[[ 9]] 'EditBox',
+    --[[10]] 'Cooldown',
+    --[[11]] 'Tooltip',
+    --[[12]] 'Scroll',
+    --[[13]] 'Slider',
+    --[[14]] 'Backdrop',
+    --[[15]] 'MapDisplay',
+    --[[16]] 'ColorSelect',
+    --[[17]] 'Line',
+    --[[18]] 'Compass',
+    --[[19]] 'TextureComposite',
+    --[[20]] 'Polygon',
+    --[[21]] 'Vector',
+    --[[22]] 'Canvas',
+}
+
 local addonName = 'LibControlTree'
 local EVENT_NAMESPACE = addonName
 
@@ -214,6 +241,8 @@ local function CreateScrollListDataType()
         label:SetText(name)
         label:SetColor(unpack(color))
         label:SetAnchorOffsets(data[2] * 25, 0)
+
+        GetControl(rowControl, 'Type'):SetText(CONTROL_TYPE_NAMES[node._control:GetType()] or 'Unknown')
 
         local navigation = GetControl(rowControl, 'Navigation')
         if node.children and #node.children > 0 then

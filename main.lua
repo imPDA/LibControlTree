@@ -35,6 +35,8 @@ local HIGHLIGHT_CONTROL = LibControlTreeHighlight
 local CONTROL_HIGHLIGHT_CONTROL = LibControlTreeControlHighlight
 local CONTROLNAME_CONTROL = LibControlTree_TLCControlName
 
+local CONTROL_TREE_ROWS
+
 
 local registry = {}
 local function _setKeybind(labelText, source)
@@ -107,6 +109,25 @@ local WHITELIST = {
 
 local LIST_CONTROL = LibControlTree_TLCListingScrollableList
 
+local function _shallowCopy(original)
+    local copy = {}
+    for i = 1, #original do
+        copy[i] = original[i]
+    end
+    return copy
+end
+
+local function _clearNumericallyIndexedTableStartingFrom(tbl, startIndex)
+    for i = startIndex, #tbl do
+        tbl[i] = nil
+    end
+end
+
+local BRANCH = 1
+local UNUSED = 2
+local END = 3
+local SKIP = 4
+
 local function Update()
     -- if self:IsHidden() then
     --     self.dirty = true
@@ -122,16 +143,31 @@ local function Update()
 
     ZO_ScrollList_Clear(control)
 
-    local function CreateAndAddDataEntry(node, level, last)
-        local value = {node, level, last}
+    CONTROL_TREE_ROWS:Clear()
+
+    local function CreateAndAddDataEntry(node, level, last, treeRow)
+        local value = {node, level, last, treeRow}
         local entry = ZO_ScrollList_CreateDataEntry(1, value)
 
         dataList[#dataList+1] = entry
     end
 
-    local function traverse(node, level, last)
-        level = level or 1
-        CreateAndAddDataEntry(node, level, last)
+    local function traverse(node, level, last, previousTreeRow)
+        local newTreeRow = _shallowCopy(previousTreeRow)
+
+        if level > #newTreeRow then
+            if newTreeRow[level-1] == END then
+                newTreeRow[level-1] = 0
+            else
+                newTreeRow[level-1] = SKIP
+            end
+        else
+            _clearNumericallyIndexedTableStartingFrom(newTreeRow, level)
+        end
+
+        newTreeRow[level] = last and END or BRANCH
+
+        CreateAndAddDataEntry(node, level, last, newTreeRow)
 
         if level == 1 and node.children then
             node.opened = true
@@ -140,12 +176,12 @@ local function Update()
         if node.children and node.opened then
             local numChildren = #node.children
             for i = 1, numChildren do
-                traverse(node.children[i], level+1, i == numChildren)
+                traverse(node.children[i], level+1, i == numChildren, newTreeRow)
             end
         end
     end
 
-    traverse(tree)
+    traverse(tree, 1, true, {END})
 
     -- table.sort(dataList, function(l, r) return compareRecursive(l, r, sortingKeys, ascending, 1) end)
 
@@ -291,6 +327,13 @@ local function CreateScrollListDataType()
 
         rowControl:SetHandler('OnMouseEnter', onMouseEnter)
         rowControl:SetHandler('OnMouseExit', onMouseExit)
+
+        local treeRow = data[4]
+        for c = 1, #treeRow do
+            if treeRow[c] ~= 0 then
+                CONTROL_TREE_ROWS:Add(c, index, 0, 0, 25, 32, treeRow[c])
+            end
+        end
     end
 
 	local control = LIST_CONTROL
@@ -309,9 +352,31 @@ local function CreateScrollListDataType()
 
 	-- ZO_ScrollList_EnableSelection(control, 'ZO_ThinListHighlight', foo)
 	-- ZO_ScrollList_SetDeselectOnReselect(control, true)
+
+    -- have to keep them to scroll relative to these offsets
+    local offsetX, offsetY = -4, 0
+    CONTROL_TREE_ROWS = LibSurfaceTools.Tools.RigidGrid(GetControl(LIST_CONTROL, 'Contents'), nil, 25, 32)
+        :SetOffsets(offsetX, offsetY)
+        :SetTexture('LibControlTree/textures/tree.dds', 2, 2)
+
+    ZO_PostHookHandler(GetControl(control, 'ScrollBar'), 'OnValueChanged', function(_, value)
+        CONTROL_TREE_ROWS:SetOffsets(offsetX, offsetY-value)
+    end)
 end
 
 -- ----------------------------------------------------------------------------
+
+local function DisplayTreeFor(control)
+    local tree = BuildTree(control)
+
+    -- Zgoo:Main(nil, 1, tree)
+
+    CURRENT_TREE = tree
+    GLOBAL_TREE = CURRENT_TREE
+
+    Update()
+end
+GLOBAL_DISPLAY_TREE_FOR = DisplayTreeFor
 
 local function OnAddonLoaded(_, addonName_)
     if addonName_ ~= addonName then return end
@@ -324,16 +389,10 @@ local function OnAddonLoaded(_, addonName_)
         -- df('MB: %s, ctrl: %s', tostring(button), tostring(ctrl))
         if button ~= MOUSE_BUTTON_INDEX_LEFT or not ctrl then return end
 
-        if controlToOpen then
-            local tree = BuildTree(controlToOpen)
-
-            -- Zgoo:Main(nil, 1, tree)
-
-            CURRENT_TREE = tree
-
-            Update()
-        end
+        if controlToOpen then DisplayTreeFor(controlToOpen) end
     end
+
+    SLASH_COMMANDS['/ctrltreem'] = function() MouseClick(nil, MOUSE_BUTTON_INDEX_LEFT, controlToOpen) end
 
     EVENT_MANAGER:RegisterForEvent(EVENT_NAMESPACE, EVENT_GLOBAL_MOUSE_UP, MouseClick)
 
